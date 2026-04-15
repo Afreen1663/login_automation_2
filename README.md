@@ -2,6 +2,7 @@
 
 This project demonstrates a login automation script built using **Playwright (Python)** for the VFS Global website:
 https://visa.vfsglobal.com/are/en/mlt/login
+
 This website is a **high-security, government-related platform protected by Cloudflare**, which actively detects and blocks automation tools. Because of this, the project focuses on building a **robust, ethical, and production-aware automation approach**, rather than attempting to bypass security mechanisms.
 
 ---
@@ -19,7 +20,7 @@ This website is a **high-security, government-related platform protected by Clou
 
 ---
 
-##Handling Bot Detection (Cloudflare)
+## Handling Bot Detection (Cloudflare)
 
 One of the biggest challenges in this task is that the VFS Global website uses **Cloudflare bot protection**, which can:
 
@@ -39,7 +40,7 @@ To handle this, I implemented several **practical mitigation techniques**:
 
 ---
 
-##CAPTCHA Handling (Important Design Choice)
+## CAPTCHA Handling (Important Design Choice)
 
 The website uses **Cloudflare Turnstile CAPTCHA**, which is specifically designed to prevent automation.
 
@@ -54,7 +55,7 @@ Instead of trying to bypass it (which is unethical and often illegal), the scrip
 
 ---
 
-##Login Result Detection
+## Login Result Detection
 
 After attempting login, the script evaluates the result using:
 
@@ -89,7 +90,7 @@ This ensures:
 
 ---
 
-## 🛡️ Error Handling & Stability
+## Error Handling & Stability
 
 The script is designed to be **robust and fault-tolerant**:
 
@@ -168,7 +169,7 @@ To demonstrate that the automation logic works correctly:
 * Login was successfully automated
 * Screenshots of successful execution are included
 
-📁 You can check the results in:
+ You can check the results in:
 
 ```
 /screenshots/
@@ -182,7 +183,7 @@ This shows that:
 
 ---
 
-## 🧠 Final Thoughts
+## Final Thoughts
 
 This project focuses on building a **realistic automation solution**, not just a working script.
 
