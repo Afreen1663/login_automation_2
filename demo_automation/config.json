@@ -1,8 +1,0 @@
-{
-  "url": "https://practicetestautomation.com/practice-test-login/",
-  "homepage": "https://practicetestautomation.com",
-  "timeout": 30000,
-  "viewport": { "width": 1280, "height": 800 },
-  "screenshots_dir": "screenshots",
-  "logs_dir": "logs"
-}
