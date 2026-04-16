@@ -1,198 +1,147 @@
-# Login Automation Script using Playwright
+# VFS Global Auto Login
 
-This project demonstrates a login automation script built using **Playwright (Python)** for the VFS Global website:
-https://visa.vfsglobal.com/are/en/mlt/login
-
-This website is a **high-security, government-related platform protected by Cloudflare**, which actively detects and blocks automation tools. Because of this, the project focuses on building a **robust, ethical, and production-aware automation approach**, rather than attempting to bypass security mechanisms.
+A Python automation script that automatically logs into the [VFS Global visa appointment portal](https://visa.vfsglobal.com/are/en/mlt/login). It uses **DrissionPage**, a Chromium-based browser automation library that controls a real Chrome browser — making it more reliable against bot-detection systems like Cloudflare compared to tools like Selenium or Playwright.
 
 ---
 
-## What This Script Does
+## How It Works — Code Overview
 
-* Opens the website and establishes a valid session
-* Navigates to the login page
-* Enters credentials securely (no hardcoding)
-* Detects CAPTCHA and pauses for manual solving
-* Determines whether login is successful, failed, or unclear
-* Captures screenshots for all outcomes
-* Logs all actions and errors
-* Supports both **headed (visible)** and **headless (background)** modes
+The script is built around four key ideas:
 
----
+### 1. Real Browser Automation (DrissionPage)
+Instead of sending raw HTTP requests, the script opens an actual Chrome browser window and interacts with the page just like a human would — clicking, typing, and scrolling. This is important because VFS Global uses Cloudflare, which blocks headless or fake browsers.
 
-## Handling Bot Detection (Cloudflare)
+### 2. Cloudflare Wait
+When the page first loads, Cloudflare runs a silent browser check. The script waits 15 seconds to give this check time to pass before trying to interact with anything on the page.
 
-One of the biggest challenges in this task is that the VFS Global website uses **Cloudflare bot protection**, which can:
+### 3. Robust Element Finding (`wait_for_element`)
+The VFS Global login page is built with Angular, which means page elements load dynamically after the initial HTML is received. A simple `find element` call would fail immediately. Instead, the script uses a `wait_for_element` function that:
+- Tries multiple CSS and XPath selectors for each field (email, password, button)
+- Retries up to 8 times with 3-second gaps between attempts
+- Returns the first element it successfully finds and confirms is visible
 
-* Detect automation frameworks like Playwright
-* Block access with “Access Denied” or “Verify you are human” pages
-* Freeze or restrict interaction
+### 4. Safe Click and Input (`safe_click`, `safe_input`)
+Angular's reactive forms need more than just setting a value — they listen for DOM events. The `safe_input` function:
+- First tries the native DrissionPage `.input()` method
+- If that fails, falls back to JavaScript to set the value and manually fires `input` and `change` events so Angular registers the change correctly
 
-To handle this, I implemented several **practical mitigation techniques**:
-
-* Used **Playwright Stealth** to mask automation fingerprints
-* Configured **realistic browser context** (user-agent, headers, viewport)
-* Added **human-like behavior** (mouse movements, delays)
-* Opened the **homepage first** to establish session
-* Suggested use of **VPN (EU region)** to avoid IP-based blocking
-
-> Even with these measures, the site may still get blocked. This is expected due to the strength of the security system.
+The `safe_click` function similarly falls back to a JavaScript click if the element has no visible bounding rectangle.
 
 ---
 
-## CAPTCHA Handling (Important Design Choice)
+## Requirements
 
-The website uses **Cloudflare Turnstile CAPTCHA**, which is specifically designed to prevent automation.
+- Python 3.10 or higher
+- Google Chrome installed on your machine
+- DrissionPage library
 
-Instead of trying to bypass it (which is unethical and often illegal), the script handles it in a **professional way**:
-
-* The script pauses execution when CAPTCHA is detected
-* The user manually solves the CAPTCHA
-* The user clicks login manually
-* The script resumes execution afterward
-
-> This approach ensures the automation remains reliable and compliant with security standards.
-
----
-
-## Login Result Detection
-
-After attempting login, the script evaluates the result using:
-
-* Current URL
-* Page title and content
-
-It categorizes outcomes into:
-
-* **Login Successful**
-* **Login Failed**
-* **Result Unclear**
-
-This makes the script flexible even when the website behavior changes.
-
----
-
-## Screenshot Capture
-
-A screenshot is captured **in every scenario**, including:
-
-* Successful login
-* Failed login
-* Blocked access
-* Errors or unexpected states
-
-This ensures:
-
-* Easy debugging
-* Clear proof of execution
-* Transparency in results
-<img width="1280" height="800" alt="blocked_20260415_140810" src="https://github.com/user-attachments/assets/091c1f1e-c27d-4892-a0fd-25cd9b9aa877" />
-
----
-
-## Error Handling & Stability
-
-The script is designed to be **robust and fault-tolerant**:
-
-* Handles timeouts using Playwright’s timeout system
-* Uses try-except blocks for unexpected errors
-* Logs all issues clearly
-* Ensures the pipeline does not crash abruptly
-
-Even if something fails, the script:
-
-* Logs the error
-* Takes a screenshot
-* Exits gracefully
-
----
-
-## Secure Credential Management
-
-Credentials are **not hardcoded** in the script.
-
-Instead, they are stored in a `.env` file:
+Install DrissionPage with:
 
 ```bash
-VFS_USERNAME=your_username
-VFS_PASSWORD=your_password
+pip install DrissionPage
 ```
 
-These are loaded securely using `python-dotenv`.
-
-> The `.env` file is intentionally not included in this repository to prevent exposing sensitive data.
-
 ---
 
-## Why the Website Gets Blocked
-
-It’s important to understand that:
-
-* VFS Global is a **high-security platform**
-* It is protected by **Cloudflare (enterprise-grade protection)**
-* It actively detects bots and automation tools
-
-So when the script gets blocked, it is **not a failure of the script**, but a **designed behavior of the website**.
-
----
-
-## Professional Approach (Real-World Perspective)
-
-In real production systems, we would **not automate login through UI** for such platforms.
-
-Instead, better approaches include:
-
-* Using **official APIs (if available)**
-* Requesting **whitelisted or internal access**
-* Working with **staging/test environments**
-* Backend-level integrations
-
-This project demonstrates awareness of these best practices.
-
----
-
-## Reusability of the Script
-
-The script is written in a **modular and reusable way**, meaning:
-
-* It can be adapted to any login-based website
-* Only selectors and URLs need to be changed
-* Core logic remains the same
-
----
-
-## Demo Automation (Proof of Working Logic)
-
-To demonstrate that the automation logic works correctly:
-
-* The same script was tested on a **demo website with lower security**
-* Login was successfully automated
-* Screenshots of successful execution are included
-
- You can check the results in:
+## Project Structure
 
 ```
-/screenshots/
+your-folder/
+├── login.py            # The main automation script
+├── credentials.json    # Your login details (you create this)
+├── login_result.png    # Screenshot saved after login (auto-generated)
+└── README.md
 ```
 
-This shows that:
+---
 
-* The automation logic is correct
-* The only limitation is external website security
-<img width="1263" height="869" alt="login_success_20260415_143908" src="https://github.com/user-attachments/assets/5a10c0e8-08fc-4811-ba28-8846993723cb" />
+## Setup
+
+**Step 1:** Clone or download this project into a folder on your computer.
+
+**Step 2:** Create a file named `credentials.json` in the same folder as `login.py` with the following content:
+
+```json
+{
+  "Email": "your@email.com",
+  "password": "yourpassword"
+}
+```
+
+Replace the values with your actual VFS Global account email and password.
+
+**Step 3:** Install the required Python package:
+
+```bash
+pip install DrissionPage
+```
 
 ---
 
-## Final Thoughts
+## Running the Script
 
-This project focuses on building a **realistic automation solution**, not just a working script.
+Open a terminal (Command Prompt or PowerShell on Windows, Terminal on Mac/Linux), navigate to the folder containing `login.py`, and run:
 
-It demonstrates:
+```bash
+python login.py
+```
 
-* Understanding of modern web security systems
-* Ethical handling of CAPTCHA and bot detection
-* Strong automation design and structure
+**What you will see:**
 
-> The goal is not to break security, but to build systems that work **within real-world constraints**.
+```
+Waiting for page to load and Cloudflare challenge to pass...
+Page title: Login | VFS Global
+Current URL: https://visa.vfsglobal.com/are/en/mlt/login
+HTML length: 234313
+Found email field via: xpath://input[contains(@placeholder,"jane")]
+Entered email: your@email.com
+Found password field via: xpath://input[@type="password"]
+Entered password
+Found login button via: xpath://button[contains(normalize-space(),"Sign In")]
+Login submitted. Waiting for redirect...
+Done! Screenshot saved as 'login_result.png'.
+Press Enter to close browser...
+```
+
+A Chrome window will open visibly so you can see exactly what the script is doing. After login completes, the browser stays open until you press Enter in the terminal.
 
 ---
+
+## Output Files
+
+| File | When it is created | Description |
+|---|---|---|
+| `login_result.png` | After successful login | Screenshot of the post-login page |
+| `error_no_email.png` | If email field is not found | Screenshot for debugging |
+| `error_no_password.png` | If password field is not found | Screenshot for debugging |
+| `error_no_button.png` | If Sign In button is not found | Screenshot for debugging |
+| `page_source.html` | If email field is not found | Full HTML of the page for inspection |
+
+---
+
+## Troubleshooting
+
+**Login submitted but redirect fails**
+The page may be showing an error (wrong password, account locked, etc.). Check `login_result.png` to see the state of the page after submission.
+
+---
+
+## Security Note
+
+The `credentials.json` file contains your login password in plain text. Do not share it or commit it to any version control system (GitHub, etc.). If using Git, add it to `.gitignore`:
+
+```
+credentials.json
+```
+
+---
+
+## Changing the Target Country / Visa Type
+
+The script currently targets the UAE portal. To use a different country or visa category, update the URL on this line in `login.py`:
+
+```python
+page.get('https://visa.vfsglobal.com/are/en/mlt/login')
+```
+
+Replace `are` (country of application) and `mlt` (nationality) with the appropriate codes from the VFS Global website.
