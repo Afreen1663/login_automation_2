@@ -136,12 +136,4 @@ credentials.json
 
 ---
 
-## Changing the Target Country / Visa Type
 
-The script currently targets the UAE portal. To use a different country or visa category, update the URL on this line in `login.py`:
-
-```python
-page.get('https://visa.vfsglobal.com/are/en/mlt/login')
-```
-
-Replace `are` (country of application) and `mlt` (nationality) with the appropriate codes from the VFS Global website.
